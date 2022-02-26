@@ -1,13 +1,11 @@
-import log from 'book';
 import Koa from 'koa';
-import tldjs from 'tldjs';
 import Debug from 'debug';
 import http from 'http';
 import { hri } from 'human-readable-ids';
 import Router from 'koa-router';
 import jwt from'koa-jwt';
 
-import ClientManager from './lib/ClientManager';
+import ClientManager from './lib/ClientManager.js';
 
 const debug = Debug('localtunnel:server');
 
@@ -20,12 +18,18 @@ function addJwtMiddleware(app, opt) {
 export default function(opt) {
     opt = opt || {};
 
-    const validHosts = (opt.domain) ? [opt.domain] : undefined;
-    const myTldjs = tldjs.fromUserSettings({ validHosts });
     const landingPage = opt.landing || 'https://localtunnel.github.io/www/';
 
     function GetClientIdFromHostname(hostname) {
-        return myTldjs.getSubdomain(hostname);
+        if (!hostname) {
+            return undefined;
+        }
+
+        if (!hostname.endsWith(`.${opt.domain}`)) {
+            return undefined;
+        }
+
+        return hostname.substring(0, hostname.length - opt.domain.length - 1);
     }
 
     const manager = new ClientManager(opt);

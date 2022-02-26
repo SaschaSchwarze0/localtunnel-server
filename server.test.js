@@ -1,13 +1,15 @@
 import request from 'supertest';
 import assert from 'assert';
-import WebSocket, {Server as WebSocketServer} from 'ws';
+import WebSocket from 'ws';
+import { WebSocketServer } from 'ws';
 import net from 'net';
 import jwt from 'jsonwebtoken';
 
+import createServer from './server.js';
 
-import createServer from './server';
+describe('Server', function() {
+    this.timeout(5000);
 
-describe('Server', () => {
     it('server starts and stops', async () => {
         const server = createServer();
         await new Promise(resolve => server.listen(resolve));
@@ -87,7 +89,7 @@ describe('Server', () => {
             });
         });
 
-        const ws = new WebSocket('http://localhost:' + server.address().port, {
+        const ws = new WebSocket('ws://localhost:' + server.address().port, {
             headers: {
                 host: hostname + '.example.com',
             }
@@ -104,7 +106,9 @@ describe('Server', () => {
             });
         });
 
-        wss.close();
+        ws.close();
+
+        await new Promise((resolve) => wss.close(resolve));
         await new Promise(resolve => server.close(resolve));
     });
 

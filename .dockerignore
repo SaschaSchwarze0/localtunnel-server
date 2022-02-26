@@ -1,2 +1,12 @@
+.dockerignore
+.env
 .git
+.gitignore
+.npmrc
+.nvmrc
+Dockerfile
+LICENSE
+README.md
 node_modules
+*lib/*.test.js
+*.test.js
